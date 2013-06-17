@@ -129,6 +129,11 @@ class BitmapData implements IBitmapDrawable {
 		nme_bitmap_data_destroy_hardware_surface (__handle);
 		
 	}
+	
+	public function reload(sourceBitmapData:BitmapData)
+	{
+		nme_bitmap_data_reload(__handle, sourceBitmapData.__handle);
+	}
 	#end
 	
 	
@@ -699,6 +704,7 @@ class BitmapData implements IBitmapDrawable {
 	private static var nme_bitmap_data_set_array = Lib.load ("nme", "nme_bitmap_data_set_array", 3);
 	private static var nme_bitmap_data_create_hardware_surface = Lib.load ("nme", "nme_bitmap_data_create_hardware_surface", 1);
 	private static var nme_bitmap_data_destroy_hardware_surface = Lib.load ("nme", "nme_bitmap_data_destroy_hardware_surface", 1);
+	private static var nme_bitmap_data_reload = Lib.load("nme", "nme_bitmap_data_reload", 2);
 	#end
 	private static var nme_bitmap_data_dispose = Lib.load ("nme", "nme_bitmap_data_dispose", 1);
 	private static var nme_bitmap_data_generate_filter_rect = Lib.load ("nme", "nme_bitmap_data_generate_filter_rect", 3);
