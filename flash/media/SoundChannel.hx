@@ -66,7 +66,7 @@ class SoundChannel extends EventDispatcher {
 	public function stop ():Void {
 		
 		nme_sound_channel_stop (__handle);
-		__handle = null;
+		//__handle = null;
 		
 	}
 	
