@@ -7,6 +7,7 @@ import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TouchEvent;
 import flash.events.Event;
+import flash.events.UncaughtErrorEvent;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.media.SoundChannel;
@@ -131,6 +132,13 @@ class Stage extends DisplayObjectContainer {
 	}
 	
 	
+	public function resize (width:Int, height:Int):Void {
+		
+		nme_stage_resize_window (__handle, width, height);
+		
+	}
+	
+	
 	public static function setFixedOrientation (orientation:Int):Void {
 		
 		// If you set this, you don't need to set the 'shouldRotateInterface' function.
@@ -205,7 +213,7 @@ class Stage extends DisplayObjectContainer {
 			
 			if (newObject != null) {
 				
-				newObject.__fireEvent (event.__createSimilar (events[1], oldObject));
+				newObject.__fireEvent (event.__createSimilar (events[1], newObject, newObject));
 				
 			}
 			
@@ -293,14 +301,21 @@ class Stage extends DisplayObjectContainer {
 	
 	
 	#if android
+	#if no_traces
+	@:functionCode("try {")
+	@:functionTailCode(' } catch(Dynamic e) { __hx_dump_stack(); }')
+	#else
 	@:noCompletion @:keep private function dummyTrace ():Void { trace (""); }
-	@:functionCode("try {") 
-	@:functionTailCode(' } catch(Dynamic e) { __hx_dump_stack(); ::haxe::Log_obj::trace(HX_CSTRING("Uncaught exception: ") + e,hx::SourceInfo(HX_CSTRING("Stage.hx"),0,HX_CSTRING("flash.display.Stage"),HX_CSTRING("__doProcessStageEvent")));}')
+	@:functionCode("try {")
+	@:functionTailCode(' } catch(Dynamic e) { __hx_dump_stack(); ::haxe::Log_obj::trace(HX_CSTRING("Uncaught exception: ") + e,hx::SourceInfo(HX_CSTRING("Stage.hx"),0,HX_CSTRING("flash.display.Stage"),HX_CSTRING("__doProcessStageEvent"))); } return 0;')
+	#end
 	#end
 	@:noCompletion private function __doProcessStageEvent (event:Dynamic):Float {
 		
 		var result = 0.0;
 		var type = Std.int (Reflect.field (event, "type"));
+		
+		try {
 		
 		switch (type) {
 			
@@ -444,6 +459,11 @@ class Stage extends DisplayObjectContainer {
 			// TODO: user, sys_wm, sound_finished
 			
 		}
+		
+		}catch ( error : Dynamic ) {
+			Lib.current.loaderInfo.uncaughtErrorEvents.dispatchEvent( new UncaughtErrorEvent( UncaughtErrorEvent.UNCAUGHT_ERROR, true, true, error ) );
+		}
+
 		
 		result = __updateNextWake ();
 		return result;
@@ -695,12 +715,12 @@ class Stage extends DisplayObjectContainer {
 		if (stack.length > 0) {
 			
 			var value = event.value;
-			if (value >= 96 && value <= 122) value -= 32;
+			if (event.value >= 96 && event.value <= 122) event.value -= 32;
 			
 			var object = stack[0];
 			var flags:Int = event.flags;
 			
-			var keyboardEvent = new KeyboardEvent (type, true, true, event.code, value, ((flags & efLocationRight) == 0) ? 1 : 0, (flags & efCtrlDown) != 0, (flags & efAltDown) != 0, (flags & efShiftDown) !=0);
+			var keyboardEvent = new KeyboardEvent (type, true, true, event.code, event.value, ((flags & efLocationRight) == 0) ? 1 : 0, (flags & efCtrlDown) != 0, (flags & efAltDown) != 0, (flags & efShiftDown) != 0);
 			object.__fireEvent (keyboardEvent);
 			
 			if (keyboardEvent.__getIsCancelled ()) {
@@ -813,11 +833,11 @@ class Stage extends DisplayObjectContainer {
 		
 		var clickObject = stack.length > 0 ? stack[stack.length - 1] : this;
 		
-		if (type == MouseEvent.MOUSE_DOWN && button < 3) {
+		if ((type == MouseEvent.MOUSE_DOWN || type == MouseEvent.MIDDLE_MOUSE_DOWN || type == MouseEvent.RIGHT_MOUSE_DOWN) && button < 3) {
 			
 			__lastDown[button] = clickObject;
 			
-		} else if (type == MouseEvent.MOUSE_UP && button < 3) {
+		} else if ((type == MouseEvent.MOUSE_UP || type == MouseEvent.MIDDLE_MOUSE_UP || type == MouseEvent.RIGHT_MOUSE_UP) && button < 3) {
 			
 			if (clickObject == __lastDown[button]) {
 				
@@ -966,6 +986,29 @@ class Stage extends DisplayObjectContainer {
 				
 				__pollTimers ();
 				
+				#if android
+				var focus = get_focus ();
+				if (focus != null && focus.needsSoftKeyboard) {
+					
+					Timer.delay (function () {
+						
+						if (focus == get_focus()) {
+							
+							requestSoftKeyboard ();
+							
+						}
+						
+					}, 100);
+					
+				}
+				#end
+				
+			} else {
+				
+				#if android
+				__dismissSoftKeyboard ();
+				#end
+				
 			}
 			
 		}
@@ -1111,6 +1154,10 @@ class Stage extends DisplayObjectContainer {
 	
 	private function set_frameRate (value:Float):Float {
 		
+		#if android
+		if (value > 60) value = 60;
+		#end
+		
 		frameRate = value;
 		__framePeriod = (frameRate <= 0 ? frameRate : 1.0 / frameRate);
 		__nextRender = __lastRender + __framePeriod;
@@ -1215,6 +1262,7 @@ class Stage extends DisplayObjectContainer {
 	private static var nme_stage_set_display_state = Lib.load ("nme", "nme_stage_set_display_state", 2);
 	private static var nme_stage_set_next_wake = Lib.load ("nme", "nme_stage_set_next_wake", 2);
 	private static var nme_stage_request_render = Lib.load ("nme", "nme_stage_request_render", 0);
+	private static var nme_stage_resize_window = Lib.load ("nme", "nme_stage_resize_window", 3);
 	private static var nme_stage_show_cursor = Lib.load ("nme", "nme_stage_show_cursor", 2);
 	private static var nme_stage_set_fixed_orientation = Lib.load ("nme", "nme_stage_set_fixed_orientation", 1);
 	private static var nme_stage_get_orientation = Lib.load ("nme", "nme_stage_get_orientation", 0);

@@ -1,7 +1,12 @@
+openfl-native
+============
+[![Build Status](https://travis-ci.org/openfl/openfl-native.png)](https://travis-ci.org/openfl/openfl-native)
+
+
 Install
 -------
 
-https://github.com/openfl/openfl/wiki/Get-Started
+http://www.openfl.org/developer/documentation/get-started
 
 
 Development Build
@@ -12,10 +17,8 @@ Development Build
 
 After cloning, "openfl-native/ndll" will be empty. You may copy the "ndll" folder from a haxelib version of openfl-native (which still may be up-to-date) or you may compile them from the source:
 
-    git clone https://github.com/haxenme/NME nme
-    git clone https://github.com/haxenme/nmedev
-    haxelib dev nme nme
-    haxelib dev nmedev nmedev
+    git clone https://github.com/openfl/openfl-native-dev
+    haxelib dev openfl-native-dev openfl-native-dev
 
 To rebuild binaries for a platform, use "openfl rebuild", such as:
 
@@ -30,6 +33,6 @@ There is also a "-rebuild" flag you can use with other OpenFL commands, for fast
 
     openfl test windows -rebuild
 
-To return to a release build:
+To return to release builds:
 
     haxelib dev openfl-native

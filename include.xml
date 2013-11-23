@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension>
 	
+	<echo value="Warning: Including &quot;openfl-native&quot; on a target platform that is not native" unless="native" />
+	
 	<section unless="display">
 		
-		<ndll name="std" haxelib="hxcpp" />
-		<ndll name="regexp" haxelib="hxcpp" />
-		<ndll name="zlib" haxelib="hxcpp" />
+		<haxelib name="hxlibc" if="cpp" />
+		
+		<ndll name="openal" register="false" if="android" />
+		<ndll name="libfreetype" register="false" if="emscripten" />
+		
+		<ndll name="curl_ssl" register="false" if="ios" />
+		<ndll name="png" register="false" if="ios" />
+		<ndll name="jpeg" register="false" if="ios" />
+		<ndll name="freetype" register="false" if="ios" />
+		<ndll name="ogg" register="false" if="ios" />
+		<ndll name="vorbis" register="false" if="ios" />
 		
 		<ndll name="nme" />
 		
-		<ndll name="libfreetype" register="false" if="emscripten" />
+		<dependency name="extension-api" path="dependencies/extension-api" if="android" />
+		
+		<architecture name="armv7" if="android" />
 		
 	</section>
 	
