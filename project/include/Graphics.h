@@ -577,7 +577,9 @@ struct RenderTarget
 {
    RenderTarget(const Rect &inRect,PixelFormat inFormat,uint8 *inPtr, int inStride);
    RenderTarget(const Rect &inRect,HardwareContext *inContext);
+   RenderTarget(const RenderTarget &renderTarget) : mStencilPtr(0) { *this = renderTarget; }
    RenderTarget();
+   ~RenderTarget();
 
    bool IsHardware() const { return mHardware; }
 
@@ -589,13 +591,19 @@ struct RenderTarget
    inline int Height() const { return mRect.h; }
 	inline PixelFormat Format() const { return mPixelFormat; }
 
+   RenderTarget &operator = (const RenderTarget &renderTarget);
+
    Rect        mRect;
    PixelFormat mPixelFormat;
 
    // Software target
    uint8 *mSoftPtr;
    int   mSoftStride;
+   uint8 *mStencilPtr;
+   mutable bool mUseStencil;
    uint8 *Row(int inRow) const { return mSoftPtr+mSoftStride*inRow; }
+   uint8 *StencilRow(int inRow) const { return mStencilPtr+mRect.w*inRow; }
+   void ClearStencil() const;
 
    // Hardware target - RenderTarget does not hold reference on HardwareContext
    HardwareContext *mHardware;
