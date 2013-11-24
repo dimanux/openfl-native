@@ -967,7 +967,12 @@ void TextField::AddNode(const TiXmlNode *inNode, TextFormat *inFormat,int &ioCha
                   if (att->NameTStr()==L"color" && val[0]=='#')
                   {
                      int col;
+                     #if ANDROID
+                     // See http://stackoverflow.com/questions/5630255/does-android-not-really-have-wchar-t
+                     if (sscanf(WideToUTF8(val+1).c_str(),"%x",&col))
+                     #else
                      if (TIXML_SSCANF(val+1,L"%x",&col))
+                     #endif
                      {
                         fmt = fmt->COW();
                         fmt->color = col;
@@ -981,7 +986,12 @@ void TextField::AddNode(const TiXmlNode *inNode, TextFormat *inFormat,int &ioCha
                   else if (att->NameTStr()==L"size")
                   {
                      int size;
+                     #if ANDROID
+                     // See http://stackoverflow.com/questions/5630255/does-android-not-really-have-wchar-t
+                     if (sscanf(WideToUTF8(att->Value()).c_str(), "%d", &size))
+                     #else
                      if (TIXML_SSCANF(att->Value(),L"%d",&size))
+                     #endif
                      {
                         fmt = fmt->COW();
                         if (val[0]=='-' || val[0]=='+')
