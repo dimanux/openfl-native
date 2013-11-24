@@ -1752,7 +1752,7 @@ void Stage::HandleEvent(Event &inEvent)
       inEvent.id = mFocusObject ? mFocusObject->id : id;
       if (mHandler)
          mHandler(inEvent,mHandlerData);
-      if (inEvent.result==0 && mFocusObject)
+      if (mFocusObject)
          mFocusObject->OnKey(inEvent);
       #ifdef ANDROID
       // Non-cancelled back key ...
