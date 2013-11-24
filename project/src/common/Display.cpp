@@ -993,7 +993,7 @@ bool DisplayObject::CreateMask(const Rect &inClipRect,int inAA)
    if (GetBitmapCache())
    {
       // Clear mask if invalid
-      if (!GetBitmapCache()->StillGood(trans, rect,0))
+      if (!GetBitmapCache()->StillGood(trans, ColorTransform(), rect,0))
       {
          SetBitmapCache(0);
       }
@@ -1030,7 +1030,7 @@ bool DisplayObject::CreateMask(const Rect &inClipRect,int inAA)
       ClearCacheDirty();
    }
    
-   SetBitmapCache( new BitmapCache(bitmap, trans, rect, false, 0));
+   SetBitmapCache( new BitmapCache(bitmap, trans, ColorTransform(), rect, false, 0));
    bitmap->DecRef();
    return true;
 }
@@ -1183,7 +1183,7 @@ void DisplayObjectContainer::Render( const RenderTarget &inTarget, const RenderS
             if (obj->GetBitmapCache())
             {
                // Done - our bitmap is good!
-               if (obj->GetBitmapCache()->StillGood(obj_state->mTransform,
+               if (obj->GetBitmapCache()->StillGood(obj_state->mTransform, *obj_state->mColourTransform,
                       visible_bitmap, mask))
                   continue;
                else
@@ -1264,7 +1264,7 @@ void DisplayObjectContainer::Render( const RenderTarget &inTarget, const RenderS
 
                full = orig;
                obj->SetBitmapCache(
-                      new BitmapCache(bitmap, obj_state->mTransform, visible_bitmap, false, mask));
+                      new BitmapCache(bitmap, obj_state->mTransform, *obj_state->mColourTransform, visible_bitmap, false, mask));
                obj_state->mRoundSizeToPOW2 = old_pow2;
                bitmap->DecRef();
             }
@@ -1474,7 +1474,7 @@ void DisplayObjectContainer::ClearCacheDirty()
 
 static int sBitmapVersion = 1;
 
-BitmapCache::BitmapCache(Surface *inSurface,const Transform &inTrans,
+BitmapCache::BitmapCache(Surface *inSurface,const Transform &inTrans, const ColorTransform &inColorTrans,
                          const Rect &inRect,bool inMaskOnly, BitmapCache *inMask)
 {
    mBitmap = inSurface->IncRef();
@@ -1487,6 +1487,7 @@ BitmapCache::BitmapCache(Surface *inSurface,const Transform &inTrans,
    mMaskVersion = inMask ? inMask->mVersion : 0;
    mMaskOffset = inMask ? ImagePoint(inMask->mTX,inMask->mTY) : ImagePoint(0,0);
    mTX = mTY = 0;
+   mColorTransform = inColorTrans;
 }
 
 BitmapCache::~BitmapCache()
@@ -1495,9 +1496,12 @@ BitmapCache::~BitmapCache()
 }
 
 
-bool BitmapCache::StillGood(const Transform &inTransform, const Rect &inVisiblePixels, BitmapCache *inMask)
+bool BitmapCache::StillGood(const Transform &inTransform, const ColorTransform &inColorTransform, const Rect &inVisiblePixels, BitmapCache *inMask)
 {
    if  (!mMatrix.IsIntTranslation(*inTransform.mMatrix,mTX,mTY) || mScale9!=*inTransform.mScale9)
+      return false;
+
+   if (!mColorTransform.IsEqualTo(inColorTransform))
       return false;
 
    if (inMask)
