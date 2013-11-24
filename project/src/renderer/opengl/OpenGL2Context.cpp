@@ -44,6 +44,8 @@ namespace nme {
 	
 	void OpenGL2Context::FinishBitmapRender () {
 		
+		if (mCurrentProg)
+			mCurrentProg->finishDrawing();
 		// TODO: Need replacement call for GLES2
 		//#ifndef NME_FORCE_GLES2
 		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
