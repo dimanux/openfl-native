@@ -1135,12 +1135,42 @@ void DisplayObjectContainer::Render( const RenderTarget &inTarget, const RenderS
       DisplayObject *mask = obj->getMask();
       if (mask)
       {
+         // this is a temp hack for mask combining, it's slow and run every frame, so avoid it as possible
+         if (obj_state->mMask != 0)
+            mask->SetBitmapCache(0);
          if (!mask->CreateMask(inTarget.mRect.Translated(obj_state->mTargetOffset),
                                obj_state->mTransform.mAAFactor))
             continue;
 
          // todo: combine masks ?
          //obj->DebugRenderMask(inTarget,obj->getMask());
+         if (obj_state->mMask != 0)
+         {
+            BitmapCache *innerMask = mask->GetBitmapCache();
+            BitmapCache *outerMask = obj_state->mMask;
+            Surface *bitmap = innerMask->mBitmap;
+            Rect bitmapRect(bitmap->Width(), bitmap->Height());
+            Surface *innerBitmap = new SimpleSurface(bitmapRect.w, bitmapRect.h, pfAlpha);
+            Surface *outerBitmap = new SimpleSurface(bitmapRect.w, bitmapRect.h, pfAlpha);
+            Rect rect = innerMask->GetRect().Intersect(outerMask->GetRect());
+            Rect innerRect = rect; innerRect.x = rect.x - innerMask->GetRect().x; innerRect.y = rect.y - innerMask->GetRect().y;
+            Rect outerRect = rect; outerRect.x = rect.x - outerMask->GetRect().x; outerRect.y = rect.y - outerMask->GetRect().y;
+            {
+            AutoSurfaceRender outerRender(outerBitmap,Rect(bitmapRect.w, bitmapRect.h));
+            outerBitmap->Zero();
+            outerMask->mBitmap->BlitTo(outerRender.Target(), outerRect, innerRect.x, innerRect.y, bmCopy, 0, 0xffffffff);
+            }
+            {
+            AutoSurfaceRender innerRender(innerBitmap,bitmapRect);
+            innerBitmap->Zero();
+            innerMask->mBitmap = outerBitmap;
+            ImagePoint buffer;
+            innerMask->PushTargetOffset(ImagePoint(innerMask->GetRect().x, innerMask->GetRect().y),buffer);
+            bitmap->BlitTo(innerRender.Target(), bitmapRect, 0, 0, bmCopy, innerMask, 0xffffffff);
+            innerMask->PopTargetOffset(buffer);
+            }
+            innerMask->mBitmap = innerBitmap;
+         }
          obj_state->mMask = mask->GetBitmapCache();
       }
 
