@@ -326,6 +326,10 @@ void ColorMatrixFilter::DoApply(const Surface *inSrc,Surface *outDest,ImagePoint
 {
    int w = outDest->Width();
    int h = outDest->Height();
+   int sw = inSrc->Width();
+   int sh = inSrc->Height();
+   w = std::min(sw,w);
+   h = std::min(sh,h);
    
    AutoSurfaceRender render(outDest);
    const RenderTarget &target = render.Target();
