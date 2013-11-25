@@ -148,6 +148,101 @@ void SimpleSurface::reload(Surface *src)
    mBase[mStride*mHeight] = 69;
 }
 
+void SimpleSurface::colorPadding()
+{
+   if (!mBase || (mPixelFormat!=pfARGB && mPixelFormat!=pfARGBSwap))
+      return;
+   Rect r(0,0,mWidth,mHeight);
+   mVersion++;
+   if (mTexture)
+      mTexture->Dirty(r);
+
+   bool swap = ((bool)(mPixelFormat & pfSwapRB) != gC0IsRed);
+   
+   int lastTexel = 0x00000000;
+   int lastTexelIndex = -1;
+   for(int y=0 ; y < mHeight ; ++y)
+   {
+      lastTexelIndex = -1;
+      int *offset = (int *)(mBase + y*mStride);
+      for (int x=0 ; x < mWidth ; ++x)
+      {
+         int color = offset[x];
+         if (swap)
+            color = ARGB::Swap(color);
+         if ((color & 0xFF000000) != 0)
+         {
+            color &= 0x00FFFFFF;
+            if (swap)
+               color = ARGB::Swap(color);
+            if (lastTexelIndex >= 0)
+            {
+               if (lastTexelIndex != (x - 1))
+               {
+                  int middle = ((x - lastTexelIndex) >> 1) + lastTexelIndex;
+                  for (int k = lastTexelIndex + 1 ; k < middle ; ++k)
+                     offset[k] = lastTexel;
+                  for (int k = middle ; k < x ; ++k)
+                     offset[k] = color;
+               }
+            }
+            else
+            {
+               for (int k = 0 ; k < x ; ++k)
+                  offset[k] = color;
+            }
+            lastTexelIndex = x;
+            lastTexel = color;
+         }
+      }
+      if (lastTexelIndex >= 0)
+      {
+         for (int k = lastTexelIndex + 1; k < mWidth ; ++k)
+            offset[k] = lastTexel;
+      }
+   }
+
+   for(int x=0 ; x < mWidth ; ++x)
+   {
+      lastTexelIndex = -1;
+      for (int y=0 ; y < mHeight ; ++y)
+      {
+         int color = ((int *)(mBase + y*mStride))[x];
+         if (swap)
+            color = ARGB::Swap(color);
+         if ((color & 0xFF000000) != 0)
+         {
+            color &= 0x00FFFFFF;
+            if (swap)
+               color = ARGB::Swap(color);
+            if (lastTexelIndex >= 0)
+            {
+               if (lastTexelIndex != (y - 1))
+               {
+                  int middle = ((y - lastTexelIndex) >> 1) + lastTexelIndex;
+                  for (int k = lastTexelIndex + 1 ; k < middle ; ++k)
+                     ((int *)(mBase + k*mStride))[x] = lastTexel;
+                  for (int k = middle ; k < y ; ++k)
+                     ((int *)(mBase + k*mStride))[x] = color;
+               }
+            }
+            else
+            {
+               for (int k = 0 ; k < y ; ++k)
+                  ((int *)(mBase + k*mStride))[x] = color;
+            }
+            lastTexelIndex = y;
+            lastTexel = color;
+         }
+      }
+      if (lastTexelIndex >= 0)
+      {
+         for (int k = lastTexelIndex + 1; k < mHeight ; ++k)
+            ((int *)(mBase + k*mStride))[x] = lastTexel;
+      }
+   }
+}
+
 void SimpleSurface::dumpBits()
 { 
    if(mBase)

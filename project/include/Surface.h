@@ -50,6 +50,7 @@ public:
    virtual void destroyHardwareSurface() { }
    virtual void dispose() { }
    virtual void reload(Surface *src) { /* reload image */}
+   virtual void colorPadding() {}
    virtual void dumpBits() { /*printf("Dumping bits from Surface\n");*/  }
    virtual void setGPUFormat( PixelFormat pf ) {}
    virtual void unmultiplyAlpha() { }
@@ -159,6 +160,7 @@ public:
    void destroyHardwareSurface();
    void dispose();
    void reload(Surface *src);
+   void colorPadding();
    void dumpBits();
 
 

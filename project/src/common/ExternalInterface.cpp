@@ -3659,6 +3659,17 @@ value nme_bitmap_data_reload(value inSurface, value srcSurface)
 }
 DEFINE_PRIM(nme_bitmap_data_reload,2);
 
+value nme_bitmap_data_color_padding(value inSurface)
+{
+   Surface *surf;
+   if (AbstractToObject(inSurface,surf))
+   {
+      surf->colorPadding();
+   }
+   return alloc_null();
+}
+DEFINE_PRIM(nme_bitmap_data_color_padding,1);
+
 value nme_bitmap_data_dump_bits(value inSurface)
 {
    Surface *surf;
