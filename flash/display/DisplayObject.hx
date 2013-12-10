@@ -59,7 +59,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 		
 		__parent = null;
 		__handle = handle;
-		__id = nme_display_object_get_id (__handle);
+		__id = lime_display_object_get_id (__handle);
 		this.name = type + " " + __id;
 		
 	}
@@ -86,7 +86,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	public function getBounds (targetCoordinateSpace:DisplayObject):Rectangle {
 		
 		var result = new Rectangle ();
-		nme_display_object_get_bounds (__handle, targetCoordinateSpace.__handle, result, true);
+		lime_display_object_get_bounds (__handle, targetCoordinateSpace.__handle, result, true);
 		return result;
 		
 	}
@@ -95,7 +95,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	public function getRect (targetCoordinateSpace:DisplayObject):Rectangle {
 		
 		var result = new Rectangle ();
-		nme_display_object_get_bounds (__handle, targetCoordinateSpace.__handle, result, false);
+		lime_display_object_get_bounds (__handle, targetCoordinateSpace.__handle, result, false);
 		return result;
 		
 	}
@@ -104,7 +104,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	public function globalToLocal (point:Point):Point {
 		
 		var result = point.clone ();
-		nme_display_object_global_to_local (__handle, result);
+		lime_display_object_global_to_local (__handle, result);
 		return result;
 		
 	}
@@ -139,7 +139,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	public function hitTestPoint (x:Float, y:Float, shapeFlag:Bool = false):Bool {
 		
-		return nme_display_object_hit_test_point (__handle, x, y, shapeFlag, true);
+		return lime_display_object_hit_test_point (__handle, x, y, shapeFlag, true);
 		
 	}
 	
@@ -147,7 +147,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	public function localToGlobal (point:Point):Point {
 		
 		var result = point.clone ();
-		nme_display_object_local_to_global (__handle, result);
+		lime_display_object_local_to_global (__handle, result);
 		return result;
 		
 	}
@@ -197,7 +197,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	@:noCompletion public function __drawToSurface (surface:Dynamic, matrix:Matrix, colorTransform:ColorTransform, blendMode:String, clipRect:Rectangle, smoothing:Bool):Void {
 		
-		nme_display_object_draw_to_surface (__handle, surface, matrix, colorTransform, blendMode, clipRect);
+		lime_display_object_draw_to_surface (__handle, surface, matrix, colorTransform, blendMode, clipRect);
 		
 	}
 	
@@ -281,7 +281,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	@:noCompletion public function __getColorTransform ():ColorTransform {
 		
 		var colorTransform = new ColorTransform ();
-		nme_display_object_get_color_transform (__handle, colorTransform, false);
+		lime_display_object_get_color_transform (__handle, colorTransform, false);
 		return colorTransform;
 		
 	}
@@ -290,7 +290,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	@:noCompletion public function __getConcatenatedColorTransform ():ColorTransform {
 		
 		var colorTransform = new ColorTransform();
-		nme_display_object_get_color_transform (__handle, colorTransform, true);
+		lime_display_object_get_color_transform (__handle, colorTransform, true);
 		return colorTransform;
 		
 	}
@@ -299,7 +299,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	@:noCompletion public function __getConcatenatedMatrix ():Matrix {
 		
 		var matrix = new Matrix();
-		nme_display_object_get_matrix (__handle, matrix, true);
+		lime_display_object_get_matrix (__handle, matrix, true);
 		return matrix;
 		
 	}
@@ -327,7 +327,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	@:noCompletion public function __getMatrix ():Matrix {
 		
 		var matrix = new Matrix ();
-		nme_display_object_get_matrix (__handle, matrix, false);
+		lime_display_object_get_matrix (__handle, matrix, false);
 		return matrix;
 		
 	}
@@ -335,7 +335,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	@:noCompletion public function __getObjectsUnderPoint (point:Point, result:Array<DisplayObject>):Void {
 		
-		if (nme_display_object_hit_test_point (__handle, point.x, point.y, true, false)) {
+		if (lime_display_object_hit_test_point (__handle, point.x, point.y, true, false)) {
 			
 			result.push (this);
 			
@@ -347,7 +347,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	@:noCompletion public function __getPixelBounds ():Rectangle {
 		
 		var bounds = new Rectangle();
-		nme_display_object_get_pixel_bounds (__handle, bounds);
+		lime_display_object_get_pixel_bounds (__handle, bounds);
 		return bounds;
 		
 	}
@@ -398,14 +398,14 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	@:noCompletion public function __setColorTransform (colorTransform:ColorTransform):Void {
 		
-		nme_display_object_set_color_transform (__handle, colorTransform);
+		lime_display_object_set_color_transform (__handle, colorTransform);
 		
 	}
 	
 	
 	@:noCompletion public function __setMatrix (matrix:Matrix):Void {
 		
-		nme_display_object_set_matrix (__handle, matrix);
+		lime_display_object_set_matrix (__handle, matrix);
 		
 	}
 	
@@ -452,10 +452,10 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	
 	
-	private function get_alpha ():Float { return nme_display_object_get_alpha (__handle); }
+	private function get_alpha ():Float { return lime_display_object_get_alpha (__handle); }
 	private function set_alpha (value:Float):Float {
 		
-		nme_display_object_set_alpha (__handle, value);
+		lime_display_object_set_alpha (__handle, value);
 		return value;
 		
 	}
@@ -463,7 +463,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	private function get_opaqueBackground ():Null<Int> {
 		
-		var i:Int = nme_display_object_get_bg (__handle);
+		var i:Int = lime_display_object_get_bg (__handle);
 		
 		if ((i & 0x01000000) == 0) {
 			
@@ -480,11 +480,11 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 		
 		if (value == null) {
 			
-			nme_display_object_set_bg (__handle, 0);
+			lime_display_object_set_bg (__handle, 0);
 			
 		} else {
 			
-			nme_display_object_set_bg (__handle, value);
+			lime_display_object_set_bg (__handle, value);
 			
 		}
 		
@@ -495,7 +495,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	private function get_blendMode ():BlendMode {
 		
-		var i:Int = nme_display_object_get_blend_mode (__handle);
+		var i:Int = lime_display_object_get_blend_mode (__handle);
 		return Type.createEnumIndex (BlendMode, i);
 		
 	}
@@ -503,25 +503,25 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	private function set_blendMode (value:BlendMode):BlendMode {
 		
-		nme_display_object_set_blend_mode (__handle, Type.enumIndex (value));
+		lime_display_object_set_blend_mode (__handle, Type.enumIndex (value));
 		return value;
 		
 	}
 	
 	
-	private function get_cacheAsBitmap ():Bool { return nme_display_object_get_cache_as_bitmap (__handle); }
+	private function get_cacheAsBitmap ():Bool { return lime_display_object_get_cache_as_bitmap (__handle); }
 	private function set_cacheAsBitmap (value:Bool):Bool {
 		
-		nme_display_object_set_cache_as_bitmap (__handle, value);
+		lime_display_object_set_cache_as_bitmap (__handle, value);
 		return value;
 		
 	}
 	
 	
-	private function get_pedanticBitmapCaching ():Bool { return nme_display_object_get_pedantic_bitmap_caching (__handle); }
+	private function get_pedanticBitmapCaching ():Bool { return lime_display_object_get_pedantic_bitmap_caching (__handle); }
 	private function set_pedanticBitmapCaching (value:Bool):Bool {
 		
-		nme_display_object_set_pedantic_bitmap_caching (__handle, value);
+		lime_display_object_set_pedantic_bitmap_caching (__handle, value);
 		return value;
 		
 	}
@@ -529,7 +529,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	private function get_pixelSnapping ():PixelSnapping {
 		
-		var i:Int = nme_display_object_get_pixel_snapping (__handle);
+		var i:Int = lime_display_object_get_pixel_snapping (__handle);
 		return Type.createEnumIndex (PixelSnapping, i);
 		
 	}
@@ -539,11 +539,11 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 		
 		if (value == null) {
 			
-			nme_display_object_set_pixel_snapping (__handle, 0);
+			lime_display_object_set_pixel_snapping (__handle, 0);
 			
 		} else {
 			
-			nme_display_object_set_pixel_snapping (__handle, Type.enumIndex (value));
+			lime_display_object_set_pixel_snapping (__handle, Type.enumIndex (value));
 			
 		}
 		
@@ -586,7 +586,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 			
 		}
 		
-		nme_display_object_set_filters (__handle, __filters);
+		lime_display_object_set_filters (__handle, __filters);
 		return filters;
 		
 	}
@@ -596,7 +596,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 		
 		if (__graphicsCache == null) {
 			
-			__graphicsCache = new Graphics (nme_display_object_get_graphics (__handle));
+			__graphicsCache = new Graphics (lime_display_object_get_graphics (__handle));
 			
 		}
 		
@@ -605,10 +605,10 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	}
 	
 	
-	private function get_height ():Float { return nme_display_object_get_height (__handle); }
+	private function get_height ():Float { return lime_display_object_get_height (__handle); }
 	private function set_height (value:Float):Float {
 		
-		nme_display_object_set_height (__handle, value);
+		lime_display_object_set_height (__handle, value);
 		return value;
 		
 	}
@@ -617,20 +617,20 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	private function set_mask (value:DisplayObject):DisplayObject {
 		
 		mask = value;
-		nme_display_object_set_mask (__handle, value == null ? null : value.__handle);
+		lime_display_object_set_mask (__handle, value == null ? null : value.__handle);
 		return value;
 		
 	}
 	
 	
-	private function get_mouseX ():Float { return nme_display_object_get_mouse_x (__handle); }
-	private function get_mouseY ():Float { return nme_display_object_get_mouse_y (__handle); }
+	private function get_mouseX ():Float { return lime_display_object_get_mouse_x (__handle); }
+	private function get_mouseY ():Float { return lime_display_object_get_mouse_y (__handle); }
 	
 	
-	private function get_name ():String { return nme_display_object_get_name (__handle); }
+	private function get_name ():String { return lime_display_object_get_name (__handle); }
 	private function set_name (value:String):String {
 		
-		nme_display_object_set_name (__handle, value);
+		lime_display_object_set_name (__handle, value);
 		return value;
 		
 	}
@@ -639,10 +639,10 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	private function get_parent ():DisplayObjectContainer { return __parent; }
 	
 	
-	private function get_rotation ():Float { return nme_display_object_get_rotation (__handle); }
+	private function get_rotation ():Float { return lime_display_object_get_rotation (__handle); }
 	private function set_rotation (value:Float):Float {
 		
-		nme_display_object_set_rotation (__handle, value);
+		lime_display_object_set_rotation (__handle, value);
 		return value;
 		
 	}
@@ -652,25 +652,25 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	private function set_scale9Grid (value:Rectangle):Rectangle {
 		
 		__scale9Grid = (value == null) ? null : value.clone ();
-		nme_display_object_set_scale9_grid (__handle, __scale9Grid);
+		lime_display_object_set_scale9_grid (__handle, __scale9Grid);
 		return value;
 		
 	}
 	
 	
-	private function get_scaleX ():Float { return nme_display_object_get_scale_x (__handle); }
+	private function get_scaleX ():Float { return lime_display_object_get_scale_x (__handle); }
 	private function set_scaleX (value:Float):Float {
 		
-		nme_display_object_set_scale_x (__handle, value);
+		lime_display_object_set_scale_x (__handle, value);
 		return value;
 		
 	}
 	
 	
-	private function get_scaleY ():Float { return nme_display_object_get_scale_y (__handle); }
+	private function get_scaleY ():Float { return lime_display_object_get_scale_y (__handle); }
 	private function set_scaleY (value:Float):Float {
 		
-		nme_display_object_set_scale_y (__handle, value);
+		lime_display_object_set_scale_y (__handle, value);
 		return value;
 		
 	}
@@ -680,7 +680,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	private function set_scrollRect (value:Rectangle):Rectangle {
 		
 		__scrollRect = (value == null) ? null : value.clone ();
-		nme_display_object_set_scroll_rect (__handle, __scrollRect);
+		lime_display_object_set_scroll_rect (__handle, __scrollRect);
 		return value;
 		
 	}
@@ -703,37 +703,37 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	}
 	
 	
-	private function get_visible ():Bool { return nme_display_object_get_visible (__handle);	}
+	private function get_visible ():Bool { return lime_display_object_get_visible (__handle);	}
 	private function set_visible (value:Bool):Bool {
 		
-		nme_display_object_set_visible (__handle, value);
+		lime_display_object_set_visible (__handle, value);
 		return value;
 		
 	}
 	
 	
-	private function get_width ():Float { return nme_display_object_get_width (__handle); }
+	private function get_width ():Float { return lime_display_object_get_width (__handle); }
 	private function set_width (value:Float):Float {
 		
-		nme_display_object_set_width (__handle, value);
+		lime_display_object_set_width (__handle, value);
 		return value;
 		
 	}
 	
 	
-	private function get_x ():Float { return nme_display_object_get_x (__handle); }
+	private function get_x ():Float { return lime_display_object_get_x (__handle); }
 	private function set_x (value:Float):Float {
 		
-		nme_display_object_set_x (__handle, value);
+		lime_display_object_set_x (__handle, value);
 		return value;
 		
 	}
 	
 	
-	private function get_y ():Float { return nme_display_object_get_y (__handle); }
+	private function get_y ():Float { return lime_display_object_get_y (__handle); }
 	private function set_y (value:Float):Float {
 		
-		nme_display_object_set_y (__handle, value);
+		lime_display_object_set_y (__handle, value);
 		return value;
 		
 	}
@@ -746,55 +746,55 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 	
 	
 	
-	private static var nme_create_display_object = Lib.load ("nme", "nme_create_display_object", 0);
-	private static var nme_display_object_get_graphics = Lib.load ("nme", "nme_display_object_get_graphics", 1);
-	private static var nme_display_object_draw_to_surface = Lib.load ("nme", "nme_display_object_draw_to_surface", -1);
-	private static var nme_display_object_get_id = Lib.load ("nme", "nme_display_object_get_id", 1);
-	private static var nme_display_object_get_x = Lib.load ("nme", "nme_display_object_get_x", 1);
-	private static var nme_display_object_set_x = Lib.load ("nme", "nme_display_object_set_x", 2);
-	private static var nme_display_object_get_y = Lib.load ("nme", "nme_display_object_get_y", 1);
-	private static var nme_display_object_set_y = Lib.load ("nme", "nme_display_object_set_y", 2);
-	private static var nme_display_object_get_scale_x = Lib.load ("nme", "nme_display_object_get_scale_x", 1);
-	private static var nme_display_object_set_scale_x = Lib.load ("nme", "nme_display_object_set_scale_x", 2);
-	private static var nme_display_object_get_scale_y = Lib.load ("nme", "nme_display_object_get_scale_y", 1);
-	private static var nme_display_object_set_scale_y = Lib.load ("nme", "nme_display_object_set_scale_y", 2);
-	private static var nme_display_object_get_mouse_x = Lib.load ("nme", "nme_display_object_get_mouse_x", 1);
-	private static var nme_display_object_get_mouse_y = Lib.load ("nme", "nme_display_object_get_mouse_y", 1);
-	private static var nme_display_object_get_rotation = Lib.load ("nme", "nme_display_object_get_rotation", 1);
-	private static var nme_display_object_set_rotation = Lib.load ("nme", "nme_display_object_set_rotation", 2);
-	private static var nme_display_object_get_bg = Lib.load ("nme", "nme_display_object_get_bg", 1);
-	private static var nme_display_object_set_bg = Lib.load ("nme", "nme_display_object_set_bg", 2);
-	private static var nme_display_object_get_name = Lib.load ("nme", "nme_display_object_get_name", 1);
-	private static var nme_display_object_set_name = Lib.load ("nme", "nme_display_object_set_name", 2);
-	private static var nme_display_object_get_width = Lib.load ("nme", "nme_display_object_get_width", 1);
-	private static var nme_display_object_set_width = Lib.load ("nme", "nme_display_object_set_width", 2);
-	private static var nme_display_object_get_height = Lib.load ("nme", "nme_display_object_get_height", 1);
-	private static var nme_display_object_set_height = Lib.load ("nme", "nme_display_object_set_height", 2);
-	private static var nme_display_object_get_alpha = Lib.load ("nme", "nme_display_object_get_alpha", 1);
-	private static var nme_display_object_set_alpha = Lib.load ("nme", "nme_display_object_set_alpha", 2);
-	private static var nme_display_object_get_blend_mode = Lib.load ("nme", "nme_display_object_get_blend_mode", 1);
-	private static var nme_display_object_set_blend_mode = Lib.load ("nme", "nme_display_object_set_blend_mode", 2);
-	private static var nme_display_object_get_cache_as_bitmap = Lib.load ("nme", "nme_display_object_get_cache_as_bitmap", 1);
-	private static var nme_display_object_set_cache_as_bitmap = Lib.load ("nme", "nme_display_object_set_cache_as_bitmap", 2);
-	private static var nme_display_object_get_pedantic_bitmap_caching = Lib.load ("nme", "nme_display_object_get_pedantic_bitmap_caching", 1);
-	private static var nme_display_object_set_pedantic_bitmap_caching = Lib.load ("nme", "nme_display_object_set_pedantic_bitmap_caching", 2);
-	private static var nme_display_object_get_pixel_snapping = Lib.load ("nme", "nme_display_object_get_pixel_snapping", 1);
-	private static var nme_display_object_set_pixel_snapping = Lib.load ("nme", "nme_display_object_set_pixel_snapping", 2);
-	private static var nme_display_object_get_visible = Lib.load ("nme", "nme_display_object_get_visible", 1);
-	private static var nme_display_object_set_visible = Lib.load ("nme", "nme_display_object_set_visible", 2);
-	private static var nme_display_object_set_filters = Lib.load ("nme", "nme_display_object_set_filters", 2);
-	private static var nme_display_object_global_to_local = Lib.load ("nme", "nme_display_object_global_to_local", 2);
-	private static var nme_display_object_local_to_global = Lib.load ("nme", "nme_display_object_local_to_global", 2);
-	private static var nme_display_object_set_scale9_grid = Lib.load ("nme", "nme_display_object_set_scale9_grid", 2);
-	private static var nme_display_object_set_scroll_rect = Lib.load ("nme", "nme_display_object_set_scroll_rect", 2);
-	private static var nme_display_object_set_mask = Lib.load ("nme", "nme_display_object_set_mask", 2);
-	private static var nme_display_object_set_matrix = Lib.load ("nme", "nme_display_object_set_matrix", 2);
-	private static var nme_display_object_get_matrix = Lib.load ("nme", "nme_display_object_get_matrix", 3);
-	private static var nme_display_object_get_color_transform = Lib.load ("nme", "nme_display_object_get_color_transform", 3);
-	private static var nme_display_object_set_color_transform = Lib.load ("nme", "nme_display_object_set_color_transform", 2);
-	private static var nme_display_object_get_pixel_bounds = Lib.load ("nme", "nme_display_object_get_pixel_bounds", 2);
-	private static var nme_display_object_get_bounds = Lib.load ("nme", "nme_display_object_get_bounds", 4);
-	private static var nme_display_object_hit_test_point = Lib.load ("nme", "nme_display_object_hit_test_point", 5);
+	private static var lime_create_display_object = Lib.load ("lime", "lime_create_display_object", 0);
+	private static var lime_display_object_get_graphics = Lib.load ("lime", "lime_display_object_get_graphics", 1);
+	private static var lime_display_object_draw_to_surface = Lib.load ("lime", "lime_display_object_draw_to_surface", -1);
+	private static var lime_display_object_get_id = Lib.load ("lime", "lime_display_object_get_id", 1);
+	private static var lime_display_object_get_x = Lib.load ("lime", "lime_display_object_get_x", 1);
+	private static var lime_display_object_set_x = Lib.load ("lime", "lime_display_object_set_x", 2);
+	private static var lime_display_object_get_y = Lib.load ("lime", "lime_display_object_get_y", 1);
+	private static var lime_display_object_set_y = Lib.load ("lime", "lime_display_object_set_y", 2);
+	private static var lime_display_object_get_scale_x = Lib.load ("lime", "lime_display_object_get_scale_x", 1);
+	private static var lime_display_object_set_scale_x = Lib.load ("lime", "lime_display_object_set_scale_x", 2);
+	private static var lime_display_object_get_scale_y = Lib.load ("lime", "lime_display_object_get_scale_y", 1);
+	private static var lime_display_object_set_scale_y = Lib.load ("lime", "lime_display_object_set_scale_y", 2);
+	private static var lime_display_object_get_mouse_x = Lib.load ("lime", "lime_display_object_get_mouse_x", 1);
+	private static var lime_display_object_get_mouse_y = Lib.load ("lime", "lime_display_object_get_mouse_y", 1);
+	private static var lime_display_object_get_rotation = Lib.load ("lime", "lime_display_object_get_rotation", 1);
+	private static var lime_display_object_set_rotation = Lib.load ("lime", "lime_display_object_set_rotation", 2);
+	private static var lime_display_object_get_bg = Lib.load ("lime", "lime_display_object_get_bg", 1);
+	private static var lime_display_object_set_bg = Lib.load ("lime", "lime_display_object_set_bg", 2);
+	private static var lime_display_object_get_name = Lib.load ("lime", "lime_display_object_get_name", 1);
+	private static var lime_display_object_set_name = Lib.load ("lime", "lime_display_object_set_name", 2);
+	private static var lime_display_object_get_width = Lib.load ("lime", "lime_display_object_get_width", 1);
+	private static var lime_display_object_set_width = Lib.load ("lime", "lime_display_object_set_width", 2);
+	private static var lime_display_object_get_height = Lib.load ("lime", "lime_display_object_get_height", 1);
+	private static var lime_display_object_set_height = Lib.load ("lime", "lime_display_object_set_height", 2);
+	private static var lime_display_object_get_alpha = Lib.load ("lime", "lime_display_object_get_alpha", 1);
+	private static var lime_display_object_set_alpha = Lib.load ("lime", "lime_display_object_set_alpha", 2);
+	private static var lime_display_object_get_blend_mode = Lib.load ("lime", "lime_display_object_get_blend_mode", 1);
+	private static var lime_display_object_set_blend_mode = Lib.load ("lime", "lime_display_object_set_blend_mode", 2);
+	private static var lime_display_object_get_cache_as_bitmap = Lib.load ("lime", "lime_display_object_get_cache_as_bitmap", 1);
+	private static var lime_display_object_set_cache_as_bitmap = Lib.load ("lime", "lime_display_object_set_cache_as_bitmap", 2);
+	private static var lime_display_object_get_pedantic_bitmap_caching = Lib.load ("lime", "lime_display_object_get_pedantic_bitmap_caching", 1);
+	private static var lime_display_object_set_pedantic_bitmap_caching = Lib.load ("lime", "lime_display_object_set_pedantic_bitmap_caching", 2);
+	private static var lime_display_object_get_pixel_snapping = Lib.load ("lime", "lime_display_object_get_pixel_snapping", 1);
+	private static var lime_display_object_set_pixel_snapping = Lib.load ("lime", "lime_display_object_set_pixel_snapping", 2);
+	private static var lime_display_object_get_visible = Lib.load ("lime", "lime_display_object_get_visible", 1);
+	private static var lime_display_object_set_visible = Lib.load ("lime", "lime_display_object_set_visible", 2);
+	private static var lime_display_object_set_filters = Lib.load ("lime", "lime_display_object_set_filters", 2);
+	private static var lime_display_object_global_to_local = Lib.load ("lime", "lime_display_object_global_to_local", 2);
+	private static var lime_display_object_local_to_global = Lib.load ("lime", "lime_display_object_local_to_global", 2);
+	private static var lime_display_object_set_scale9_grid = Lib.load ("lime", "lime_display_object_set_scale9_grid", 2);
+	private static var lime_display_object_set_scroll_rect = Lib.load ("lime", "lime_display_object_set_scroll_rect", 2);
+	private static var lime_display_object_set_mask = Lib.load ("lime", "lime_display_object_set_mask", 2);
+	private static var lime_display_object_set_matrix = Lib.load ("lime", "lime_display_object_set_matrix", 2);
+	private static var lime_display_object_get_matrix = Lib.load ("lime", "lime_display_object_get_matrix", 3);
+	private static var lime_display_object_get_color_transform = Lib.load ("lime", "lime_display_object_get_color_transform", 3);
+	private static var lime_display_object_set_color_transform = Lib.load ("lime", "lime_display_object_set_color_transform", 2);
+	private static var lime_display_object_get_pixel_bounds = Lib.load ("lime", "lime_display_object_get_pixel_bounds", 2);
+	private static var lime_display_object_get_bounds = Lib.load ("lime", "lime_display_object_get_bounds", 4);
+	private static var lime_display_object_hit_test_point = Lib.load ("lime", "lime_display_object_hit_test_point", 5);
 	
 	
 }

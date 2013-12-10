@@ -29,32 +29,34 @@ class ApplicationMain {
 		
 		::if (APP_INIT != null)::::APP_INIT::::end::
 		
+		::if (WIN_ORIENTATION == "landscape")::#if tizen
+		flash.display.Stage.setFixedOrientation (flash.display.Stage.OrientationLandscapeRight);
+		#end::end::
+		
 		flash.Lib.create (function () {
 				
 				flash.Lib.current.stage.align = flash.display.StageAlign.TOP_LEFT;
 				flash.Lib.current.stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
 				flash.Lib.current.loaderInfo = flash.display.LoaderInfo.create (null);
 				
-				#if mobile
-				if (::WIN_WIDTH:: != 0 && ::WIN_HEIGHT:: != 0) {
-					
-					forceWidth = ::WIN_WIDTH::;
-					forceHeight = ::WIN_HEIGHT::;
-					
-					container = new flash.display.Sprite ();
-					barA = new flash.display.Sprite ();
-					barB = new flash.display.Sprite ();
-					
-					flash.Lib.current.stage.addChild (container);
-					container.addChild (flash.Lib.current);
-					container.addChild (barA);
-					container.addChild (barB);
-					
-					applyScale ();
-					flash.Lib.current.stage.addEventListener (flash.events.Event.RESIZE, applyScale);
-					
-				}
-				#end
+				::if (WIN_WIDTH != 0)::::if (WIN_HEIGHT != 0)::#if mobile
+				
+				forceWidth = ::WIN_WIDTH::;
+				forceHeight = ::WIN_HEIGHT::;
+				
+				container = new flash.display.Sprite ();
+				barA = new flash.display.Sprite ();
+				barB = new flash.display.Sprite ();
+				
+				flash.Lib.current.stage.addChild (container);
+				container.addChild (flash.Lib.current);
+				container.addChild (barA);
+				container.addChild (barB);
+				
+				applyScale ();
+				flash.Lib.current.stage.addEventListener (flash.events.Event.RESIZE, applyScale);
+				
+				#end::end::::end::
 				
 				#if windows
 				try {
@@ -116,25 +118,26 @@ class ApplicationMain {
 		
 	}
 	
-	
+	::if (WIN_WIDTH != 0)::::if (WIN_HEIGHT != 0)::#if mobile
 	public static function applyScale (?_) {
+		var scaledStage:ScaledStage = cast flash.Lib.current.stage;
 		
-		var xScale:Float = untyped (flash.Lib.current.stage).stageWidth / forceWidth;
-		var yScale:Float = untyped (flash.Lib.current.stage).stageHeight / forceHeight;
+		var xScale:Float = scaledStage.__stageWidth / forceWidth;
+		var yScale:Float = scaledStage.__stageHeight / forceHeight;
 		
 		if (xScale < yScale) {
 			
 			flash.Lib.current.scaleX = xScale;
 			flash.Lib.current.scaleY = xScale;
-			flash.Lib.current.x = (untyped (flash.Lib.current.stage).stageWidth - (forceWidth * xScale)) / 2;
-			flash.Lib.current.y = (untyped (flash.Lib.current.stage).stageHeight - (forceHeight * xScale)) / 2;
+			flash.Lib.current.x = (scaledStage.__stageWidth - (forceWidth * xScale)) / 2;
+			flash.Lib.current.y = (scaledStage.__stageHeight - (forceHeight * xScale)) / 2;
 			
 		} else {
 			
 			flash.Lib.current.scaleX = yScale;
 			flash.Lib.current.scaleY = yScale;
-			flash.Lib.current.x = (untyped (flash.Lib.current.stage).stageWidth - (forceWidth * yScale)) / 2;
-			flash.Lib.current.y = (untyped (flash.Lib.current.stage).stageHeight - (forceHeight * yScale)) / 2;
+			flash.Lib.current.x = (scaledStage.__stageWidth - (forceWidth * yScale)) / 2;
+			flash.Lib.current.y = (scaledStage.__stageHeight - (forceHeight * yScale)) / 2;
 			
 		}
 		
@@ -142,27 +145,28 @@ class ApplicationMain {
 			
 			barA.graphics.clear ();
 			barA.graphics.beginFill (0x000000);
-			barA.graphics.drawRect (0, 0, flash.Lib.current.x, untyped (flash.Lib.current.stage).stageHeight);
+			barA.graphics.drawRect (0, 0, flash.Lib.current.x, scaledStage.__stageHeight);
 			
 			barB.graphics.clear ();
 			barB.graphics.beginFill (0x000000);
 			var x = flash.Lib.current.x + (forceWidth * flash.Lib.current.scaleX);
-			barB.graphics.drawRect (x, 0, untyped (flash.Lib.current.stage).stageWidth - x, untyped (flash.Lib.current.stage).stageHeight);
+			barB.graphics.drawRect (x, 0, scaledStage.__stageWidth - x, scaledStage.__stageHeight);
 			
 		} else {
 			
 			barA.graphics.clear ();
 			barA.graphics.beginFill (0x000000);
-			barA.graphics.drawRect (0, 0, untyped (flash.Lib.current.stage).stageWidth, flash.Lib.current.y);
+			barA.graphics.drawRect (0, 0, scaledStage.__stageWidth, flash.Lib.current.y);
 			
 			barB.graphics.clear ();
 			barB.graphics.beginFill (0x000000);
 			var y = flash.Lib.current.y + (forceHeight * flash.Lib.current.scaleY);
-			barB.graphics.drawRect (0, y, untyped (flash.Lib.current.stage).stageWidth, untyped (flash.Lib.current.stage).stageHeight - y);
+			barB.graphics.drawRect (0, y, scaledStage.__stageWidth, scaledStage.__stageHeight - y);
 			
 		}
 		
 	}
+	#end::end::::end::
 	
 	
 	#if neko

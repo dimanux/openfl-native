@@ -15,7 +15,10 @@ import flash.net.URLLoader;
 import flash.ui.Keyboard;
 import flash.Lib;
 import flash.Vector;
+import haxe.io.Bytes;
+import haxe.CallStack;
 import haxe.Timer;
+import openfl.display.OpenGLView;
 import openfl.events.JoystickEvent;
 import openfl.events.SystemEvent;
 
@@ -34,6 +37,7 @@ class Stage extends DisplayObjectContainer {
 	
 	public var active (default, null):Bool;
 	public var align (get, set):StageAlign;
+	public var color (get, set):Int;
 	public var displayState (get, set):StageDisplayState;
 	public var dpiScale (get, null):Float;
 	public var focus (get, set):InteractiveObject;
@@ -93,12 +97,12 @@ class Stage extends DisplayObjectContainer {
 		
 		#if android
 		__hatValue = 0;
-		renderRequest = nme_stage_request_render;
+		renderRequest = lime_stage_request_render;
 		#else
 		renderRequest = null;
 		#end
 		
-		nme_set_stage_handler (__handle, __processStageEvent, width, height);
+		lime_set_stage_handler (__handle, __processStageEvent, width, height);
 		__invalid = false;
 		__lastRender = 0;
 		__lastDown = [];
@@ -113,14 +117,14 @@ class Stage extends DisplayObjectContainer {
 	
 	public static dynamic function getOrientation ():Int {
 		
-		return nme_stage_get_orientation ();
+		return lime_stage_get_orientation ();
 		
 	}
 	
 	
 	public static dynamic function getNormalOrientation ():Int {
 		
-		return nme_stage_get_normal_orientation ();
+		return lime_stage_get_normal_orientation ();
 		
 	}
 	
@@ -134,7 +138,7 @@ class Stage extends DisplayObjectContainer {
 	
 	public function resize (width:Int, height:Int):Void {
 		
-		nme_stage_resize_window (__handle, width, height);
+		lime_stage_resize_window (__handle, width, height);
 		
 	}
 	
@@ -142,7 +146,7 @@ class Stage extends DisplayObjectContainer {
 	public static function setFixedOrientation (orientation:Int):Void {
 		
 		// If you set this, you don't need to set the 'shouldRotateInterface' function.
-		nme_stage_set_fixed_orientation (orientation);
+		lime_stage_set_fixed_orientation (orientation);
 		
 	}
 	
@@ -156,7 +160,7 @@ class Stage extends DisplayObjectContainer {
 	
 	public function showCursor (show:Bool):Void {
 		
-		nme_stage_show_cursor (__handle, show);
+		lime_stage_show_cursor (__handle, show);
 		
 	}
 	
@@ -316,154 +320,163 @@ class Stage extends DisplayObjectContainer {
 		var type = Std.int (Reflect.field (event, "type"));
 		
 		try {
-		
-		switch (type) {
 			
-			case 2: // etChar
+			switch (type) {
 				
-				if (onKey != null)
-					untyped onKey (event.code, event.down, event.char, event.flags);
-			
-			case 1: // etKeyDown
-				
-				__onKey (event, KeyboardEvent.KEY_DOWN);
-			
-			case 3: // etKeyUp
-				
-				__onKey (event, KeyboardEvent.KEY_UP);
-			
-			case 4: // etMouseMove
-				
-				__onMouse (event, MouseEvent.MOUSE_MOVE, true);
-			
-			case 5: // etMouseDown
-				
-				__onMouse (event, MouseEvent.MOUSE_DOWN, true);
-			
-			case 6: // etMouseClick
-				
-				__onMouse (event, MouseEvent.CLICK, true);
-			
-			case 7: // etMouseUp
-				
-				__onMouse (event, MouseEvent.MOUSE_UP, true);
-			
-			case 8: // etResize
-				
-				__onResize (event.x, event.y);
-				if (renderRequest == null) {
+				case 2: // etChar
 					
-					__render (false);
+					if (onKey != null)
+						untyped onKey (event.code, event.down, event.char, event.flags);
+				
+				case 1: // etKeyDown
 					
-				}
-			
-			case 9: // etPoll
+					__onKey (event, KeyboardEvent.KEY_DOWN);
 				
-				__pollTimers ();
-			
-			case 10: // etQuit
-				
-				if (onQuit != null)
-					untyped onQuit ();
-			
-			case 11: // etFocus
-				
-				__onFocus (event);
-			
-			case 12: // etShouldRotate
-				
-				if (shouldRotateInterface (event.value))
-					event.result = 2;
-			
-			case 14: // etRedraw
-				
-				__render (true);
-			
-			case 15: // etTouchBegin
-				
-				var touchInfo = new TouchInfo ();
-				__touchInfo.set (event.value, touchInfo);
-				__onTouch (event, TouchEvent.TOUCH_BEGIN, touchInfo);
-				
-				if ((event.flags & 0x8000) > 0) {
+				case 3: // etKeyUp
 					
-					__onMouse (event, MouseEvent.MOUSE_DOWN, false);
+					__onKey (event, KeyboardEvent.KEY_UP);
+				
+				case 4: // etMouseMove
 					
-				}
-			
-			case 16: // etTouchMove
+					__onMouse (event, MouseEvent.MOUSE_MOVE, true);
 				
-				var touchInfo = __touchInfo.get (event.value);
-				__onTouch (event, TouchEvent.TOUCH_MOVE, touchInfo);
-			
-			case 17: // etTouchEnd
-				
-				var touchInfo = __touchInfo.get (event.value);
-				__onTouch (event, TouchEvent.TOUCH_END, touchInfo);
-				__touchInfo.remove (event.value);
-				
-				if ((event.flags & 0x8000) > 0) {
+				case 5: // etMouseDown
 					
-					__onMouse (event, MouseEvent.MOUSE_UP, false);
+					__onMouse (event, MouseEvent.MOUSE_DOWN, true);
+				
+				case 6: // etMouseClick
 					
-				}
-			
-			case 18: // etTouchTap
+					__onMouse (event, MouseEvent.CLICK, true);
 				
-				//_onTouchTap (event.TouchEvent.TOUCH_TAP);
-			
-			case 19: // etChange
+				case 7: // etMouseUp
+					
+					__onMouse (event, MouseEvent.MOUSE_UP, true);
 				
-				__onChange (event);
-			
-			case 20: // etActivate
+				case 8: // etResize
+					
+					__onResize (event.x, event.y);
+					if (renderRequest == null) {
+						
+						__render (false);
+						
+					}
 				
-				__setActive (true);
-			
-			case 21: // etDeactivate
+				case 9: // etPoll
+					
+					__pollTimers ();
 				
-				__setActive (false);
-			
-			case 22: // etGotInputFocus
+				case 10: // etQuit
+					
+					if (onQuit != null)
+						untyped onQuit ();
 				
-				__dispatchEvent (new Event (FocusEvent.FOCUS_IN));
-			
-			case 23: // etLostInputFocus
+				case 11: // etFocus
+					
+					__onFocus (event);
 				
-				__dispatchEvent (new Event (FocusEvent.FOCUS_OUT));
-			
-			case 24: // etJoyAxisMove
+				case 12: // etShouldRotate
+					
+					if (shouldRotateInterface (event.value))
+						event.result = 2;
 				
-				__onJoystick (event, JoystickEvent.AXIS_MOVE);
-			
-			case 25: // etJoyBallMove
+				case 14: // etRedraw
+					
+					__render (true);
 				
-				__onJoystick (event, JoystickEvent.BALL_MOVE);
-			
-			case 26: // etJoyHatMove
+				case 15: // etTouchBegin
+					
+					var touchInfo = new TouchInfo ();
+					__touchInfo.set (event.value, touchInfo);
+					__onTouch (event, TouchEvent.TOUCH_BEGIN, touchInfo);
+					
+					if ((event.flags & 0x8000) > 0) {
+						
+						__onMouse (event, MouseEvent.MOUSE_DOWN, false);
+						
+					}
 				
-				__onJoystick (event, JoystickEvent.HAT_MOVE);
-			
-			case 27: // etJoyButtonDown
+				case 16: // etTouchMove
+					
+					var touchInfo = __touchInfo.get (event.value);
+					__onTouch (event, TouchEvent.TOUCH_MOVE, touchInfo);
 				
-				__onJoystick (event, JoystickEvent.BUTTON_DOWN);
-			
-			case 28: // etJoyButtonUp
+				case 17: // etTouchEnd
+					
+					var touchInfo = __touchInfo.get (event.value);
+					__onTouch (event, TouchEvent.TOUCH_END, touchInfo);
+					__touchInfo.remove (event.value);
+					
+					if ((event.flags & 0x8000) > 0) {
+						
+						__onMouse (event, MouseEvent.MOUSE_UP, false);
+						
+					}
 				
-				__onJoystick (event, JoystickEvent.BUTTON_UP);
-			
-			case 29: // etSysWM
+				case 18: // etTouchTap
+					
+					//_onTouchTap (event.TouchEvent.TOUCH_TAP);
 				
-				__onSysWM (event);
+				case 19: // etChange
+					
+					__onChange (event);
+				
+				case 20: // etActivate
+					
+					__setActive (true);
+				
+				case 21: // etDeactivate
+					
+					__setActive (false);
+				
+				case 22: // etGotInputFocus
+					
+					__dispatchEvent (new Event (FocusEvent.FOCUS_IN));
+				
+				case 23: // etLostInputFocus
+					
+					__dispatchEvent (new Event (FocusEvent.FOCUS_OUT));
+				
+				case 24: // etJoyAxisMove
+					
+					__onJoystick (event, JoystickEvent.AXIS_MOVE);
+				
+				case 25: // etJoyBallMove
+					
+					__onJoystick (event, JoystickEvent.BALL_MOVE);
+				
+				case 26: // etJoyHatMove
+					
+					__onJoystick (event, JoystickEvent.HAT_MOVE);
+				
+				case 27: // etJoyButtonDown
+					
+					__onJoystick (event, JoystickEvent.BUTTON_DOWN);
+				
+				case 28: // etJoyButtonUp
+					
+					__onJoystick (event, JoystickEvent.BUTTON_UP);
+				
+				case 29: // etSysWM
+					
+					__onSysWM (event);
+				
+				case 30: // etRenderContextLost
+					
+					__onRenderContext (false);
+				
+				case 31: // etRenderContextRestored
+					
+					__onRenderContext (true);
+				
+				// TODO: user, sys_wm, sound_finished
+				
+			}
 			
-			// TODO: user, sys_wm, sound_finished
+		} catch (error:Dynamic) {
+			
+			Lib.rethrow (error);
 			
 		}
-		
-		}catch ( error : Dynamic ) {
-			Lib.current.loaderInfo.uncaughtErrorEvents.dispatchEvent( new UncaughtErrorEvent( UncaughtErrorEvent.UNCAUGHT_ERROR, true, true, error ) );
-		}
-
 		
 		result = __updateNextWake ();
 		return result;
@@ -867,6 +880,14 @@ class Stage extends DisplayObjectContainer {
 	}
 	
 	
+	@:noCompletion private function __onRenderContext (active:Bool):Void {
+		
+		var event = new Event (!active ? OpenGLView.CONTEXT_LOST : OpenGLView.CONTEXT_RESTORED);
+		__dispatchEvent (event);
+		
+	}
+	
+	
 	@:noCompletion private function __onResize (width:Float, height:Float):Void {
 		
 		var event = new Event (Event.RESIZE);
@@ -961,7 +982,7 @@ class Stage extends DisplayObjectContainer {
 			
 		}
 		
-		nme_render_stage (__handle);
+		lime_render_stage (__handle);
 		
 	}
 	
@@ -1074,7 +1095,7 @@ class Stage extends DisplayObjectContainer {
 		}
 		
 		nextWake = __nextFrameDue (nextWake);
-		nme_stage_set_next_wake (__handle, nextWake);
+		lime_stage_set_next_wake (__handle, nextWake);
 		return nextWake;
 		
 	}
@@ -1089,7 +1110,7 @@ class Stage extends DisplayObjectContainer {
 	
 	private function get_align ():StageAlign {
 		
-		var i:Int = nme_stage_get_align (__handle);
+		var i:Int = lime_stage_get_align (__handle);
 		return Type.createEnumIndex (StageAlign, i);
 		
 	}
@@ -1097,15 +1118,29 @@ class Stage extends DisplayObjectContainer {
 	
 	private function set_align (value:StageAlign):StageAlign {
 		
-		nme_stage_set_align (__handle, Type.enumIndex (value));
+		lime_stage_set_align (__handle, Type.enumIndex (value));
 		return value;
+		
+	}
+	
+	
+	private function get_color ():Int {
+		
+		return opaqueBackground;
+		
+	}
+	
+	
+	private function set_color (value:Int):Int {
+		
+		return opaqueBackground = value;
 		
 	}
 	
 	
 	private function get_displayState ():StageDisplayState {
 		
-		var i:Int = nme_stage_get_display_state (__handle);
+		var i:Int = lime_stage_get_display_state (__handle);
 		return Type.createEnumIndex (StageDisplayState, i);
 		
 	}
@@ -1113,7 +1148,7 @@ class Stage extends DisplayObjectContainer {
 	
 	private function set_displayState (value:StageDisplayState):StageDisplayState {
 		
-		nme_stage_set_display_state (__handle, Type.enumIndex (value));
+		lime_stage_set_display_state (__handle, Type.enumIndex (value));
 		return value;
 		
 	}
@@ -1121,14 +1156,14 @@ class Stage extends DisplayObjectContainer {
 	
 	private function get_dpiScale ():Float {
 		
-		return nme_stage_get_dpi_scale (__handle);
+		return lime_stage_get_dpi_scale (__handle);
 		
 	}
 	
 	
 	private function get_focus ():InteractiveObject {
 		
-		var id = nme_stage_get_focus_id (__handle);
+		var id = lime_stage_get_focus_id (__handle);
 		var object = __findByID (id);
 		return cast object;
 		
@@ -1139,11 +1174,11 @@ class Stage extends DisplayObjectContainer {
 		
 		if (value == null) {
 			
-			nme_stage_set_focus (__handle, null, 0);
+			lime_stage_set_focus (__handle, null, 0);
 			
 		} else {
 			
-			nme_stage_set_focus (__handle, value.__handle, 0);
+			lime_stage_set_focus (__handle, value.__handle, 0);
 			
 		}
 		
@@ -1168,14 +1203,14 @@ class Stage extends DisplayObjectContainer {
 	
 	private function get_isOpenGL ():Bool {
 		
-		return nme_stage_is_opengl (__handle);
+		return lime_stage_is_opengl (__handle);
 		
 	}
 	
 	
 	private function get_quality ():StageQuality {
 		
-		var i:Int = nme_stage_get_quality (__handle);
+		var i:Int = lime_stage_get_quality (__handle);
 		return Type.createEnumIndex (StageQuality, i);
 		
 	}
@@ -1183,7 +1218,7 @@ class Stage extends DisplayObjectContainer {
 	
 	private function set_quality (value:StageQuality):StageQuality {
 		
-		nme_stage_set_quality (__handle, Type.enumIndex (value));
+		lime_stage_set_quality (__handle, Type.enumIndex (value));
 		return value;
 		
 	}
@@ -1191,7 +1226,7 @@ class Stage extends DisplayObjectContainer {
 	
 	private function get_scaleMode ():StageScaleMode {
 		
-		var i:Int = nme_stage_get_scale_mode (__handle);
+		var i:Int = lime_stage_get_scale_mode (__handle);
 		return Type.createEnumIndex (StageScaleMode, i);
 		
 	}
@@ -1199,7 +1234,7 @@ class Stage extends DisplayObjectContainer {
 	
 	private function set_scaleMode (value:StageScaleMode):StageScaleMode {
 		
-		nme_stage_set_scale_mode (__handle, Type.enumIndex (value));
+		lime_stage_set_scale_mode (__handle, Type.enumIndex (value));
 		return value;
 		
 	}
@@ -1212,10 +1247,10 @@ class Stage extends DisplayObjectContainer {
 	}
 	
 	
-	private function get_stageFocusRect ():Bool { return nme_stage_get_focus_rect (__handle); }
+	private function get_stageFocusRect ():Bool { return lime_stage_get_focus_rect (__handle); }
 	private function set_stageFocusRect (value:Bool):Bool {
 		
-		nme_stage_set_focus_rect (__handle, value);
+		lime_stage_set_focus_rect (__handle, value);
 		return value;
 		
 	}
@@ -1223,14 +1258,14 @@ class Stage extends DisplayObjectContainer {
 	
 	private function get_stageHeight ():Int {
 		
-		return Std.int (cast (nme_stage_get_stage_height (__handle), Float));
+		return Std.int (cast (lime_stage_get_stage_height (__handle), Float));
 		
 	}
 	
 	
 	private function get_stageWidth ():Int {
 		
-		return Std.int (cast (nme_stage_get_stage_width (__handle), Float));
+		return Std.int (cast (lime_stage_get_stage_width (__handle), Float));
 		
 	}
 	
@@ -1242,31 +1277,31 @@ class Stage extends DisplayObjectContainer {
 	
 	
 	
-	private static var nme_set_stage_handler = Lib.load ("nme", "nme_set_stage_handler", 4);
-	private static var nme_render_stage = Lib.load ("nme", "nme_render_stage", 1);
-	private static var nme_stage_get_focus_id = Lib.load ("nme", "nme_stage_get_focus_id", 1);
-	private static var nme_stage_set_focus = Lib.load ("nme", "nme_stage_set_focus", 3);
-	private static var nme_stage_get_focus_rect = Lib.load ("nme", "nme_stage_get_focus_rect", 1);
-	private static var nme_stage_set_focus_rect = Lib.load ("nme", "nme_stage_set_focus_rect", 2);
-	private static var nme_stage_is_opengl = Lib.load ("nme", "nme_stage_is_opengl", 1);
-	private static var nme_stage_get_stage_width = Lib.load ("nme", "nme_stage_get_stage_width", 1);
-	private static var nme_stage_get_stage_height = Lib.load ("nme", "nme_stage_get_stage_height", 1);
-	private static var nme_stage_get_dpi_scale = Lib.load ("nme", "nme_stage_get_dpi_scale", 1);
-	private static var nme_stage_get_scale_mode = Lib.load ("nme", "nme_stage_get_scale_mode", 1);
-	private static var nme_stage_set_scale_mode = Lib.load ("nme", "nme_stage_set_scale_mode", 2);
-	private static var nme_stage_get_align = Lib.load ("nme", "nme_stage_get_align", 1);
-	private static var nme_stage_set_align = Lib.load ("nme", "nme_stage_set_align", 2);
-	private static var nme_stage_get_quality = Lib.load ("nme", "nme_stage_get_quality", 1);
-	private static var nme_stage_set_quality = Lib.load ("nme", "nme_stage_set_quality", 2);
-	private static var nme_stage_get_display_state = Lib.load ("nme", "nme_stage_get_display_state", 1);
-	private static var nme_stage_set_display_state = Lib.load ("nme", "nme_stage_set_display_state", 2);
-	private static var nme_stage_set_next_wake = Lib.load ("nme", "nme_stage_set_next_wake", 2);
-	private static var nme_stage_request_render = Lib.load ("nme", "nme_stage_request_render", 0);
-	private static var nme_stage_resize_window = Lib.load ("nme", "nme_stage_resize_window", 3);
-	private static var nme_stage_show_cursor = Lib.load ("nme", "nme_stage_show_cursor", 2);
-	private static var nme_stage_set_fixed_orientation = Lib.load ("nme", "nme_stage_set_fixed_orientation", 1);
-	private static var nme_stage_get_orientation = Lib.load ("nme", "nme_stage_get_orientation", 0);
-	private static var nme_stage_get_normal_orientation = Lib.load ("nme", "nme_stage_get_normal_orientation", 0);
+	private static var lime_set_stage_handler = Lib.load ("lime", "lime_set_stage_handler", 4);
+	private static var lime_render_stage = Lib.load ("lime", "lime_render_stage", 1);
+	private static var lime_stage_get_focus_id = Lib.load ("lime", "lime_stage_get_focus_id", 1);
+	private static var lime_stage_set_focus = Lib.load ("lime", "lime_stage_set_focus", 3);
+	private static var lime_stage_get_focus_rect = Lib.load ("lime", "lime_stage_get_focus_rect", 1);
+	private static var lime_stage_set_focus_rect = Lib.load ("lime", "lime_stage_set_focus_rect", 2);
+	private static var lime_stage_is_opengl = Lib.load ("lime", "lime_stage_is_opengl", 1);
+	private static var lime_stage_get_stage_width = Lib.load ("lime", "lime_stage_get_stage_width", 1);
+	private static var lime_stage_get_stage_height = Lib.load ("lime", "lime_stage_get_stage_height", 1);
+	private static var lime_stage_get_dpi_scale = Lib.load ("lime", "lime_stage_get_dpi_scale", 1);
+	private static var lime_stage_get_scale_mode = Lib.load ("lime", "lime_stage_get_scale_mode", 1);
+	private static var lime_stage_set_scale_mode = Lib.load ("lime", "lime_stage_set_scale_mode", 2);
+	private static var lime_stage_get_align = Lib.load ("lime", "lime_stage_get_align", 1);
+	private static var lime_stage_set_align = Lib.load ("lime", "lime_stage_set_align", 2);
+	private static var lime_stage_get_quality = Lib.load ("lime", "lime_stage_get_quality", 1);
+	private static var lime_stage_set_quality = Lib.load ("lime", "lime_stage_set_quality", 2);
+	private static var lime_stage_get_display_state = Lib.load ("lime", "lime_stage_get_display_state", 1);
+	private static var lime_stage_set_display_state = Lib.load ("lime", "lime_stage_set_display_state", 2);
+	private static var lime_stage_set_next_wake = Lib.load ("lime", "lime_stage_set_next_wake", 2);
+	private static var lime_stage_request_render = Lib.load ("lime", "lime_stage_request_render", 0);
+	private static var lime_stage_resize_window = Lib.load ("lime", "lime_stage_resize_window", 3);
+	private static var lime_stage_show_cursor = Lib.load ("lime", "lime_stage_show_cursor", 2);
+	private static var lime_stage_set_fixed_orientation = Lib.load ("lime", "lime_stage_set_fixed_orientation", 1);
+	private static var lime_stage_get_orientation = Lib.load ("lime", "lime_stage_get_orientation", 0);
+	private static var lime_stage_get_normal_orientation = Lib.load ("lime", "lime_stage_get_normal_orientation", 0);
 	
 	
 }
