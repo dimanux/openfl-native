@@ -159,7 +159,7 @@ public:
 
    bool CaretOn();
    bool IsCacheDirty();
-
+   value GetNativeDescription();
 
 
 

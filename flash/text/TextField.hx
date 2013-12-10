@@ -98,7 +98,13 @@ class TextField extends InteractiveObject {
 		nme_text_field_set_text_format (__handle, format, beginIndex, endIndex);
 		
 	}
-	
+
+
+	public function getNativeDescription():Dynamic {
+
+		return nme_text_field_get_native_description(__handle);
+
+	}
 	
 	
 	
@@ -204,6 +210,6 @@ class TextField extends InteractiveObject {
 	private static var nme_text_field_get_line_text = Lib.load ("nme", "nme_text_field_get_line_text", 2);
 	private static var nme_text_field_get_line_metrics = Lib.load ("nme", "nme_text_field_get_line_metrics", 3);
 	private static var nme_text_field_get_line_offset = Lib.load ("nme", "nme_text_field_get_line_offset", 2);
-	
+	private static var nme_text_field_get_native_description = Lib.load("nme", "nme_text_field_get_native_description", 1);
 	
 }
