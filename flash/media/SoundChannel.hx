@@ -99,7 +99,7 @@ class SoundChannel extends EventDispatcher {
 		#end
 		
 		lime_sound_channel_stop (__handle);
-		__handle = null;
+		//__handle = null;
 		__soundInstance = null;
 		
 	}
