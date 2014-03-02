@@ -10,5 +10,9 @@ class GlowFilter extends DropShadowFilter {
 		
 	}
 	
-	
+	override public function clone ():BitmapFilter {
+		
+		return new GlowFilter(color, alpha, blurX, blurY, strength, quality, inner, knockout);
+		
+	}
 }
