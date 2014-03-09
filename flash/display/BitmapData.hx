@@ -30,6 +30,7 @@ class BitmapData implements IBitmapDrawable {
 	public inline static var FORMAT_565 = 2;  //16 bit 565 without alpha
 		
 	public var height (get, null):Int;
+	public var premultipliedAlpha (get, set):Bool;
 	public var rect (get, null):Rectangle;
 	public var transparent (get, null):Bool;
 	public var width (get, null):Int;
@@ -38,7 +39,7 @@ class BitmapData implements IBitmapDrawable {
 	@:noCompletion private var __transparent:Bool;
 	
 	
-	public function new (width:Int, height:Int, transparent:Bool = true, fillColor:Int = 0xFFFFFFFF, gpuMode:Null<Bool> = null) {
+	public function new (width:Int, height:Int, transparent:Bool = true, fillColor:Int = 0xFFFFFFFF, gpuMode:Null<Int> = null) {
 		
 		__transparent = transparent;
 		
@@ -354,27 +355,22 @@ class BitmapData implements IBitmapDrawable {
 		memory.position = 0;
 		Memory.select (memory);
 		
-		var width_yy:Int, position:Int, pixelMask:Int;
-		var pixelValue:Int, r:Int, g:Int, b:Int, color:Int;
+		var position:Int, pixelValue:Int, r:Int, g:Int, b:Int, color:Int;
 		
-		for (yy in 0...sh) {
-			width_yy = sw * yy;
+		for (i in 0...(sh*sw)) {
+			position = i * 4;
+			pixelValue = cast Memory.getI32(position);
 			
-			for (xx in 0...sw) {
-				position = (width_yy + xx) * 4;
-				pixelValue = cast Memory.getI32(position);
-				
-				r = (pixelValue >> 8) & 0xFF;
-				g = (pixelValue >> 16) & 0xFF;
-				b = (pixelValue >> 24) & 0xFF;
-				
-				color = __flipPixel((0xff << 24) |
-					redArray[r] | 
-					greenArray[g] | 
-					blueArray[b]);
-				
-				Memory.setI32(position, color);
-			}
+			r = (pixelValue >> 8) & 0xFF;
+			g = (pixelValue >> 16) & 0xFF;
+			b = (pixelValue >> 24) & 0xFF;
+			
+			color = __flipPixel((0xff << 24) |
+				redArray[r] | 
+				greenArray[g] | 
+				blueArray[b]);
+			
+			Memory.setI32(position, color);
 		}
 		
 		memory.position = 0;
@@ -402,13 +398,6 @@ class BitmapData implements IBitmapDrawable {
 	public function scroll (x:Int, y:Int):Void {
 		
 		lime_bitmap_data_scroll (__handle, x, y);
-		
-	}
-	
-	
-	public function setAlphaMode (alphaMode:Int):Void {
-		
-		lime_bitmap_data_set_alpha_mode (__handle, alphaMode);
 		
 	}
 	
@@ -721,6 +710,8 @@ class BitmapData implements IBitmapDrawable {
 	
 	
 	
+	private function get_premultipliedAlpha ():Bool { return lime_bitmap_data_get_prem_alpha (__handle); }
+	private function set_premultipliedAlpha (value:Bool):Bool { lime_bitmap_data_set_prem_alpha (__handle, value); return value; }
 	private function get_rect ():Rectangle { return new Rectangle (0, 0, width, height); }
 	private function get_width ():Int { return lime_bitmap_data_width (__handle); }
 	private function get_height ():Int { return lime_bitmap_data_height (__handle); }
@@ -778,8 +769,8 @@ class BitmapData implements IBitmapDrawable {
 	private static var lime_bitmap_data_noise = Lib.load ("lime", "lime_bitmap_data_noise", -1);
 	private static var lime_bitmap_data_unmultiply_alpha = Lib.load ("lime", "lime_bitmap_data_unmultiply_alpha", 1);
 	private static var lime_bitmap_data_multiply_alpha = Lib.load ("lime", "lime_bitmap_data_multiply_alpha", 1);
-	private static var lime_bitmap_data_set_alpha_mode = Lib.load ("lime", "lime_bitmap_data_set_alpha_mode", 2);
-	
+	private static var lime_bitmap_data_get_prem_alpha = Lib.load ("lime", "lime_bitmap_data_get_prem_alpha", 1);
+	private static var lime_bitmap_data_set_prem_alpha = Lib.load ("lime", "lime_bitmap_data_set_prem_alpha", 2);
 	
 }
 
@@ -856,9 +847,10 @@ class OptimizedPerlin {
 	private var baseFactor:Float;
 	
 	
-	public function new (seed = 123, octaves = 4, falloff = 0.5) {
+	public function new (seed = 123, numOctaves = 4, falloff = 0.5) {
 		
 		baseFactor = 1 / 64;
+		octaves = numOctaves;
 		seedOffset (seed);
 		octFreqPers (falloff);
 		
@@ -979,7 +971,7 @@ class OptimizedPerlin {
 	}
 	
 	
-	private function octFreqPers (fPersistence) {
+	private function octFreqPers (fPersistence:Float):Void {
 		
 		var fFreq:Float, fPers:Float;
 		
@@ -1002,7 +994,7 @@ class OptimizedPerlin {
 	}
 	
 	
-	private function seedOffset (iSeed:Int) {
+	private function seedOffset (iSeed:Int):Void {
 		
 		iXoffset = iSeed = Std.int((iSeed * 16807.) % 2147483647);
 		iYoffset = iSeed = Std.int((iSeed * 16807.) % 2147483647);

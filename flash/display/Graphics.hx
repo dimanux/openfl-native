@@ -141,7 +141,7 @@ class Graphics {
 	}
 	
 	
-	public function drawTiles (sheet:Tilesheet, data:Array<Float>, smooth:Bool = false, flags:Int = 0):Void {
+	public function drawTiles (sheet:Tilesheet, data:Array<Float>, smooth:Bool = false, flags:Int = 0, count:Int = -1):Void {
 		
 		beginBitmapFill (sheet.__bitmap, null, false, smooth);
 		
@@ -151,15 +151,15 @@ class Graphics {
 			
 		}
 		
-		lime_gfx_draw_tiles (__handle, sheet.__handle, data, flags);
+		lime_gfx_draw_tiles (__handle, sheet.__handle, data, flags, count);
 		
 	}
 	
 	
-	public function drawTriangles (vertices:Array<Float>, indices:Array<Int> = null, uvtData:Array<Float> = null, culling:TriangleCulling = null, colors:Array<Int> = null, blendMode:Int = 0, viewport:Array<Float> = null):Void {
+	public function drawTriangles (vertices:Array<Float>, indices:Array<Int> = null, uvtData:Array<Float> = null, culling:TriangleCulling = null, colors:Array<Int> = null, blendMode:Int = 0):Void {
 		
 		var cull:Int = (culling == null ? 0 : Type.enumIndex (culling) - 1);
-		lime_gfx_draw_triangles (__handle, vertices, indices, uvtData, cull, colors, blendMode, viewport);
+		lime_gfx_draw_triangles (__handle, vertices, indices, uvtData, cull, colors, blendMode);
 		
 	}
 	
@@ -244,7 +244,7 @@ class Graphics {
 	private static var lime_gfx_draw_datum = Lib.load ("lime", "lime_gfx_draw_datum", 2);
 	private static var lime_gfx_draw_rect = Lib.load ("lime", "lime_gfx_draw_rect", 5);
 	private static var lime_gfx_draw_path = Lib.load ("lime", "lime_gfx_draw_path", 4);
-	private static var lime_gfx_draw_tiles = Lib.load ("lime", "lime_gfx_draw_tiles", 4);
+	private static var lime_gfx_draw_tiles = Lib.load ("lime", "lime_gfx_draw_tiles", 5);
 	private static var lime_gfx_draw_points = Lib.load ("lime", "lime_gfx_draw_points", -1);
 	private static var lime_gfx_draw_round_rect = Lib.load ("lime", "lime_gfx_draw_round_rect", -1);
 	private static var lime_gfx_draw_triangles = Lib.load ("lime", "lime_gfx_draw_triangles", -1);

@@ -27,6 +27,7 @@ class Stage extends DisplayObjectContainer {
 	
 	
 	@:noCompletion public static var __earlyWakeup = 0.005;
+	@:noCompletion public static var __exiting = false;
 	
 	public static var OrientationPortrait = 1;
 	public static var OrientationPortraitUpsideDown = 2;
@@ -140,6 +141,21 @@ class Stage extends DisplayObjectContainer {
 		
 		lime_stage_resize_window (__handle, width, height);
 		
+	}
+
+
+	public function setResolution (width:Int, height:Int):Void {
+		lime_stage_set_resolution(__handle, width, height);
+	}
+
+
+	public function setScreenMode (mode:flash.system.ScreenMode):Void {
+		lime_stage_set_screenmode(__handle, mode.width, mode.height, mode.refreshRate, 0);
+	}
+
+
+	public function setFullscreen (full:Bool):Void {
+		lime_stage_set_fullscreen(__handle, full);
 	}
 	
 	
@@ -368,7 +384,7 @@ class Stage extends DisplayObjectContainer {
 				case 10: // etQuit
 					
 					if (onQuit != null)
-						untyped onQuit ();
+						onQuit ();
 				
 				case 11: // etFocus
 					
@@ -456,15 +472,23 @@ class Stage extends DisplayObjectContainer {
 					
 					__onJoystick (event, JoystickEvent.BUTTON_UP);
 				
-				case 29: // etSysWM
+				case 29: //etJoyDeviceAdded
+
+			        __onJoystick (event, JoystickEvent.DEVICE_ADDED);
+
+		        case 30: //etJoyDeviceRemoved
+
+		    	    __onJoystick (event, JoystickEvent.DEVICE_REMOVED);
+
+				case 31: // etSysWM
 					
 					__onSysWM (event);
 				
-				case 30: // etRenderContextLost
+				case 32: // etRenderContextLost
 					
 					__onRenderContext (false);
 				
-				case 31: // etRenderContextRestored
+				case 33: // etRenderContextRestored
 					
 					__onRenderContext (true);
 				
@@ -638,6 +662,14 @@ class Stage extends DisplayObjectContainer {
 				
 				joystickEvent = new JoystickEvent (type, false, false, event.id, event.code, event.x, event.y);
 			
+		    case JoystickEvent.DEVICE_ADDED:
+		
+		        joystickEvent = new JoystickEvent (type, false, false, event.id); 
+
+		    case JoystickEvent.DEVICE_REMOVED:
+
+		        joystickEvent = new JoystickEvent (type, false, false, event.id);
+
 			case JoystickEvent.HAT_MOVE:
 				
 				var x = 0;
@@ -822,7 +854,7 @@ class Stage extends DisplayObjectContainer {
 			var mouseEvent = MouseEvent.__create (type, event, local, object);
 			mouseEvent.delta = wheel;
 			
-			if (fromMouse) {
+			if (fromMouse || (event.flags & 0x8000) > 0) {
 				
 				__checkInOuts (mouseEvent, stack);
 				
@@ -836,7 +868,7 @@ class Stage extends DisplayObjectContainer {
 			var mouseEvent = MouseEvent.__create (type, event, local, null);
 			mouseEvent.delta = wheel;
 			
-			if (fromMouse) {
+			if (fromMouse || (event.flags & 0x8000) > 0) {
 				
 				__checkInOuts (mouseEvent, stack);
 				
@@ -920,9 +952,18 @@ class Stage extends DisplayObjectContainer {
 			var object = stack[0];
 			stack.reverse ();
 			var local = object.globalToLocal (new Point (event.x, event.y));
-			var touchEvent = TouchEvent.__create (type, event, local, object, event.sx, event.sy);
+			var touchEvent = TouchEvent.__create (type, event, local, object, event.scaleX, event.scaleY);
 			touchEvent.touchPointID = event.value;
 			touchEvent.isPrimaryTouchPoint = (event.flags & 0x8000) > 0;
+			
+			if (touchEvent.isPrimaryTouchPoint) {
+				
+				var mouseEvent = MouseEvent.__create (type, event, local, object);
+				__checkInOuts (mouseEvent, stack);
+				object.__fireEvent (touchEvent);
+				
+			}
+			
 			__checkInOuts (touchEvent, stack, touchInfo);
 			object.__fireEvent (touchEvent);
 			
@@ -941,7 +982,7 @@ class Stage extends DisplayObjectContainer {
 			
 		} else {
 			
-			var touchEvent = TouchEvent.__create (type, event, new Point (event.x, event.y), null, event.sx, event.sy);
+			var touchEvent = TouchEvent.__create (type, event, new Point (event.x, event.y), null, event.scaleX, event.scaleY);
 			touchEvent.touchPointID = event.value;
 			touchEvent.isPrimaryTouchPoint = (event.flags & 0x8000) > 0;
 			__checkInOuts (touchEvent, stack, touchInfo);
@@ -952,6 +993,12 @@ class Stage extends DisplayObjectContainer {
 	
 	
 	@:noCompletion public function __pollTimers ():Void {
+		
+		if (__exiting) {
+			
+			return;
+			
+		}
 		
 		Timer.__checkTimers ();
 		SoundChannel.__pollComplete ();
@@ -1189,10 +1236,6 @@ class Stage extends DisplayObjectContainer {
 	
 	private function set_frameRate (value:Float):Float {
 		
-		#if android
-		if (value > 60) value = 60;
-		#end
-		
 		frameRate = value;
 		__framePeriod = (frameRate <= 0 ? frameRate : 1.0 / frameRate);
 		__nextRender = __lastRender + __framePeriod;
@@ -1298,6 +1341,9 @@ class Stage extends DisplayObjectContainer {
 	private static var lime_stage_set_next_wake = Lib.load ("lime", "lime_stage_set_next_wake", 2);
 	private static var lime_stage_request_render = Lib.load ("lime", "lime_stage_request_render", 0);
 	private static var lime_stage_resize_window = Lib.load ("lime", "lime_stage_resize_window", 3);
+	private static var lime_stage_set_resolution = Lib.load ("lime", "lime_stage_set_resolution", 3);
+	private static var lime_stage_set_screenmode = Lib.load("lime","lime_stage_set_screenmode", 5);
+	private static var lime_stage_set_fullscreen = Lib.load ("lime", "lime_stage_set_fullscreen", 2);
 	private static var lime_stage_show_cursor = Lib.load ("lime", "lime_stage_show_cursor", 2);
 	private static var lime_stage_set_fixed_orientation = Lib.load ("lime", "lime_stage_set_fixed_orientation", 1);
 	private static var lime_stage_get_orientation = Lib.load ("lime", "lime_stage_get_orientation", 0);

@@ -64,11 +64,13 @@ class Socket extends EventDispatcher implements IDataInput /*implements IDataOut
 		return _output.length;
 	}
 
-    public function new() {
+    public function new(host:String = null, port:Int = 0) {
 		super();
 		endian = Endian.BIG_ENDIAN;
 		timeout = 20000;
 		_buf = haxe.io.Bytes.alloc( 4096 );
+		if( port > 0 && port < 65535 )
+			connect(host, port);
 	}
 	
 	public function connect( ?host: String = null, ?port: Int = 0) {
