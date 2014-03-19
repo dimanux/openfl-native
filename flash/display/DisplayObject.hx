@@ -391,7 +391,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 			var event = new Event (Event.REMOVED_FROM_STAGE, false, false);
 			event.target = object;
 			dispatchEvent (event);
-			__stage = (__parent == null ? null : __parent.stage);
+			__stage = null;
 		}
 		
 	}
@@ -432,7 +432,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 			
 		} else if (__parent != null && parent == null) {
 			
-			__onRemoved (this, __parent != null);
+			__onRemoved (this, __stage != null);
 			__parent = parent;
 			
 		} else {
