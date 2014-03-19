@@ -432,7 +432,7 @@ class DisplayObject extends EventDispatcher implements IBitmapDrawable {
 			
 		} else if (__parent != null && parent == null) {
 			
-			__onRemoved (this, wasOnStage);
+			__onRemoved (this, __parent != null);
 			__parent = parent;
 			
 		} else {
